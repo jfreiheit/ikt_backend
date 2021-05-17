@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Node.js upload images</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+    <style>
+        div.preview-images>img {
+            width: 30%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-8 mt-3">
+                <h4>Eingaben für neuen Post</h4>
+
+                <form class="mt-4" enctype="multipart/form-data">
+
+                    <div class="form-group mb-3">
+                        <input type="text" name="title" id="input-title" placeholder="Title" class="form-control" />
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <input type="text" name="location" id="input-location" placeholder="Location" class="form-control" />
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="input-files" aria-describedby="inputGroupFileAddon01">
+                            <label class="custom-file-label" for="input-files">Click Browse to choose image file ...</label>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="preview-images"></div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns" crossorigin="anonymous"></script>
+
+    <script>
+        let imageValue = null;
+        let titleValue = null;
+        let locationValue = null;
+
+        $(document).ready(() => {
+            let imagesPreview = (input, placeToInsertImagePreview) => {
+                if (input.files) {
+                    let filesAmount = input.files.length;
+                    for (let i = 0; i < filesAmount; i++) {
+                        let reader = new FileReader();
+                        reader.onload = (event) => {
+                            $($.parseHTML("<img>"))
+                                .attr("src", event.target.result)
+                                .appendTo(placeToInsertImagePreview);
+                            console.log("eingabe", event.target.result);
+                            let imageValueResult = event.target.result;
+                            imageValue = imageValueResult.substr(reader.result.indexOf(',') + 1);
+                        };
+                        reader.readAsDataURL(input.files[i]);
+                    }
+                }
+                checkIfAllInputsAreFilled();
+            };
+            $("#input-files").on("change", function() {
+                imagesPreview(this, "div.preview-images");
+            });
+            $("#input-title").on("change", () => {
+                titleValue = $("#input-title").val();
+                console.log("title : ", titleValue);
+                checkIfAllInputsAreFilled();
+            });
+            $("#input-location").on("change", () => {
+                locationValue = $("#input-location").val();
+                console.log("location : ", locationValue);
+                checkIfAllInputsAreFilled();
+            });
+            let checkIfAllInputsAreFilled = () => {
+                if (imageValue !== null && titleValue !== null && locationValue !== null) {
+                    console.log("completed");
+                    let obj = {
+                        title: titleValue,
+                        location: locationValue,
+                        image: imageValue
+                    };
+                    let objJSON = JSON.stringify(obj);
+                    console.log("obj  ...", obj);
+                    console.log("json ...", objJSON)
+
+                } else {
+                    console.log("not yet completed");
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
